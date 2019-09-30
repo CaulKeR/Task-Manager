@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Task Manager</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.1.0/mustache.min.js"></script>
+    <script src="js/personsForm.js"></script>
+    <script src="js/tasksForm.js"></script>
+    <script src="js/tasksLogsForm.js"></script>
+    <script src="js/utility.js"></script>
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="" onclick=showPersons();>Task Manager</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link clickable" onclick=showPersons();>Persons</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link clickable" onclick=showTasks();>Tasks</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link clickable" onclick=showTasksLogs();>Tasks logs</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div id="personsForm">
+    <script type="text/template" id="dynamicPersonsTable">
+        <thead>
+        <tr>
+            <th class="th-sm">First name</th>
+            <th class="th-sm">Last name</th>
+            <th class="th-sm">Patronymic</th>
+            <th class="th-sm">Login</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#.}}
+        <tr>
+            <td onclick=showPersonPage({{id}}) class="clickable">{{firstName}}</td>
+            <td onclick=showPersonPage({{id}}) class="clickable">{{lastName}}</td>
+            <td onclick=showPersonPage({{id}}) class="clickable">{{patronymic}}</td>
+            <td onclick=showPersonPage({{id}}) class="clickable">{{login}}</td>
+        </tr>
+        {{/.}}
+        </tbody>
+    </script>
+    <h2 class="text-center">Persons</h2>
+    <div class="text-right">
+        <button type="button" class="btn btn-dark fixed-right" onclick="showCreatePersonForm()">Create new person
+        </button>
+    </div>
+    <table id="personsTable" class="table table-hover table-bordered table-sm"></table>
+</div>
+<div id="personPageForm">
+    <div id="hiddenPersonId" hidden></div>
+    <script type="text/template" id="dynamicPersonPageTable">
+        <thead>
+        <tr>
+            <th class="th-sm">Title</th>
+            <th class="th-sm">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#.}}
+        <tr>
+            <td>{{title}}</td>
+            <td>{{status}}</td>
+        </tr>
+        {{/.}}
+        </tbody>
+    </script>
+    <h2 class="text-center">Active tasks</h2>
+    <div class="text-right">
+        <button type="button" class="btn btn-dark fixed-right"
+                onclick="showCreateTaskForm(document.getElementById('hiddenPersonId').innerText)">Add new task for this
+            person
+        </button>
+    </div>
+    <table id="personPageTable" class="table table-hover table-bordered table-sm"></table>
+
+    <script type="text/template" id="dynamicPersonInfoPage">
+        <form>
+            <p>
+                <label for="editPersonFirstName">First name: </label>
+                <input id="editPersonFirstName" maxlength="33" type="text" required value="{{firstName}}">
+            </p>
+            <p>
+                <label for="editPersonLastName">Enter last name: </label>
+                <input id="editPersonLastName" maxlength="33" type="text" required value="{{lastName}}">
+            </p>
+            <p>
+                <label for="editPersonPatronymic">Enter patronymic: </label>
+                <input id="editPersonPatronymic" maxlength="33" type="text" required value="{{patronymic}}">
+            </p>
+            <p>
+                <label for="editPersonLogin">Enter login: </label>
+                <input id="editPersonLogin" maxlength="33" type="text" required value="{{login}}">
+            </p>
+            <p>
+                <label for="editPersonPassword">Enter password: </label>
+                <input id="editPersonPassword" maxlength="33" type="text" required value="{{password}}">
+            </p>
+        </form>
+    </script>
+    <h2 class="text-center">Person info</h2>
+    <div id="personInfoPage"></div>
+    <button type="button" class="btn btn-dark fixed-right"
+            onclick="editPersonInfo(document.getElementById('hiddenPersonId').innerText)">Edit person's information
+    </button>
+</div>
+<div id="createPersonForm">
+    <h2 class="text-center">Create new person</h2>
+    <form>
+        <p>
+            <label for="createPersonFirstName">Enter first name: </label>
+            <input id="createPersonFirstName" maxlength="33" type="text" required>
+        </p>
+        <p>
+            <label for="createPersonLastName">Enter last name: </label>
+            <input id="createPersonLastName" maxlength="33" type="text" required>
+        </p>
+        <p>
+            <label for="createPersonPatronymic">Enter patronymic: </label>
+            <input id="createPersonPatronymic" maxlength="33" type="text" required>
+        </p>
+        <p>
+            <label for="createPersonLogin">Enter login: </label>
+            <input id="createPersonLogin" maxlength="33" type="text" required>
+        </p>
+        <p>
+            <label for="createPersonPassword">Enter password: </label>
+            <input id="createPersonPassword" maxlength="33" type="text" required>
+        </p>
+        <button type="button" class="btn btn-dark fixed-right"
+                onclick="createPerson();">Add new person
+        </button>
+    </form>
+</div>
+<div id="tasksForm">
+    <script type="text/template" id="dynamicTasksTable">
+        <thead>
+        <tr>
+            <th class="th-sm">Title</th>
+            <th class="th-sm">Executor</th>
+            <th class="th-sm">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#.}}
+        <tr>
+            <td onclick="showTaskPage({{id}})" class="clickable">{{title}}</td>
+            <td onclick="showTaskPage({{id}})" class="clickable">{{person.firstName}} {{person.lastName}}
+                {{person.patronymic}}
+            </td>
+            <td onclick="showTaskPage({{id}})" class="clickable">{{status}}</td>
+        </tr>
+        {{/.}}
+        </tbody>
+    </script>
+    <h2 class="text-center">Tasks</h2>
+    <table id="tasksTable" class="table table-hover table-bordered table-sm"></table>
+</div>
+<div id="taskPageForm">
+    <div id="hiddenTaskId" hidden></div>
+    <script type="text/template" id="dynamicTaskInfoPage">
+        <form>
+            <p>Title: {{title}}</p>
+            <p>Executor: {{person.firstName}} {{person.lastName}} {{person.patronymic}}</p>
+            <p>
+                <label for="editTaskStatus">Select new status</label>
+                <select id="editTaskStatus">
+                    <option value="not started">Not started</option>
+                    <option value="in progress">In progress</option>
+                    <option value="done">Done</option>
+                </select>
+            </p>
+            <p>
+                <label for="editTaskStatusSpentTime">Enter spent time: </label>
+                <input id="editTaskStatusSpentTime" maxlength="6" type="number">
+            </p>
+            <p>
+                <label for="editTaskStatusComment">Enter comment: </label>
+                <input id="editTaskStatusComment" maxlength="400" type="text">
+            </p>
+        </form>
+    </script>
+    <h2 class="text-center">Task info</h2>
+    <div id="taskInfoPage"></div>
+    <button type="button" class="btn btn-dark fixed-right"
+            onclick="editTaskStatus(document.getElementById('hiddenTaskId').innerText)">Edit task's status
+    </button>
+</div>
+<div id="createTaskForm">
+    <h2 class="text-center">Create new task</h2>
+    <form>
+        <p>
+            <label for="createTaskTitle">Enter title: </label>
+            <input id="createTaskTitle" maxlength="200" type="text" required>
+        </p>
+        <p>
+            <label for="createTaskStatus">Select initial status</label>
+            <select id="createTaskStatus">
+                <option value="not started" selected>Not started</option>
+                <option value="in progress">In progress</option>
+                <option value="done">Done</option>
+            </select>
+        </p>
+        <button type="button" class="btn btn-dark fixed-right"
+                onclick="createTaskForPerson();">Add new task
+        </button>
+    </form>
+</div>
+<div id="tasksLogsForm">
+    <script type="text/template" id="dynamicTasksLogsTable">
+        <thead>
+        <tr>
+            <th class="th-sm text-center" colspan="2">Task</th>
+            <th class="th-sm text-center" colspan="4">Executor</th>
+            <th class="th-sm text-center tex align-middle" rowspan="2">Spent time in hours</th>
+            <th class="th-sm text-center align-middle" rowspan="2">Comment</th>
+        </tr>
+        <tr>
+            <th class="th-sm text-center">Task title</th>
+            <th class="th-sm text-center">Task status</th>
+            <th class="th-sm text-center">First name</th>
+            <th class="th-sm text-center">Last name</th>
+            <th class="th-sm text-center">Patronymic</th>
+            <th class="th-sm text-center">Login</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#.}}
+        <tr>
+            <td>{{task.title}}</td>
+            <td>{{task.status}}</td>
+            <td>{{task.person.firstName}}</td>
+            <td>{{task.person.lastName}}</td>
+            <td>{{task.person.patronymic}}</td>
+            <td>{{task.person.login}}</td>
+            <td>{{spentTime}}</td>
+            <td>{{comment}}</td>
+        </tr>
+        {{/.}}
+        </tbody>
+    </script>
+    <h2 class="text-center">Tasks logs</h2>
+    <table id="tasksLogsTable" class="table table-hover table-bordered table-sm"></table>
+</div>
+</body>
+</html>
